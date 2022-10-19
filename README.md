@@ -17,7 +17,45 @@ It requreis to execute only a single command:
     `ansible-playbook full_config.yml`
 
 You can also run just verification playbook (which is also included in full_config.yml script) by executing:
+
     `ansible-playbook show_commands.yml`
+
+
+```yaml
+---
+# tasks file for roles/show_status
+
+- name: Send list of show commands to all device(s)
+  ios_command:
+    commands: 
+     - show ip int brief
+     - sh ip route | begin Gateway
+     - sh ip ospf neighbor 
+     - sh ip protocols | section ospf
+     
+  register: command_output
+
+- name: Display command output stored in "command_output" variable
+  debug:
+    var: command_output["stdout_lines"]
+
+    #var: command_output["stdout_lines"][0]
+
+- name: Send list of show commands to IPsec enabled device(s)
+  ios_command:
+    commands: 
+     - sh interface Tunnel 1
+     - sh interface tunnel 1 | inc protection|source|protocol|Internet|MTU
+     - sh crypto session 
+  register: command_output2
+  when: "Tunnels is defined"
+
+- name: Display command output stored in "command_output" variable
+  debug:
+    var: command_output2["stdout_lines"]  
+
+```
+
 
 ####For this lab I use:
   *  jinja2 template to configure interfaces as well as IPsec settings
@@ -28,6 +66,7 @@ You can also run just verification playbook (which is also included in full_conf
 ##### Device variables for R1 rotuer.
 
 ``` yaml
+---
 interfaces:
  - name: Ethernet0/0
    description: Link to R2 configured by Ansible
