@@ -1,0 +1,10 @@
+---
+# tasks file for roles/save_config
+- name: IOS >> Save Configuration to NVRAM
+  cisco.ios.ios_config:
+    save_when: always
+  register: output
+
+# - name: DEBUG >> output
+#   ansible.builtin.debug:
+#     msg: "{{ output }}"

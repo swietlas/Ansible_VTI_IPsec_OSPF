@@ -1,0 +1,158 @@
+Building configuration...
+
+Current configuration : 2128 bytes
+!
+! Last configuration change at 22:59:09 EET Thu Oct 13 2022 by ansi
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+aqm-register-fnf
+!
+vrf definition MGMT
+ description MGMT_VRF
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+clock timezone EET 2 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip domain name lab
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+username ansi privilege 15 secret 5 $1$6kxE$uqPPtZuJWWGPzaUa.ppEq0
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Loopback 0 configured by Ansible
+ ip address 10.3.3.3 255.255.255.0
+ ipv6 address FE80::3:3 link-local
+ ipv6 address 2001:DB8:ACAD:3::3/64
+!
+interface Ethernet0/0
+ description Link to R2 configured by Ansible
+ ip address 10.1.23.3 255.255.255.0
+ ipv6 address FE80::23:3 link-local
+ ipv6 address 2001:DB8:ACAD:23::3/64
+!
+interface Ethernet0/1
+ description Link to D2 configured by Ansible
+ ip address 10.1.32.1 255.255.255.0
+ ipv6 address FE80::32:3 link-local
+ ipv6 address 2001:DB8:ACAD:32::3/64
+ no cdp enable
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ description MGMT
+ vrf forwarding MGMT
+ ip address dhcp
+ no cdp enable
+!
+!
+router eigrp AS_CISCO
+ !
+ address-family ipv4 unicast autonomous-system 64513
+  !
+  topology base
+  exit-af-topology
+  network 10.1.23.0 0.0.0.255
+  network 10.3.3.0 0.0.0.255
+  eigrp router-id 3.3.3.3
+ exit-address-family
+!
+!
+router eigrp 64514
+ network 10.1.32.0 0.0.0.255
+ eigrp router-id 3.3.3.3
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+banner motd ^C
+Attention - This is a secure network device
+Authorized personal only should connect and manage
+this device.
+
+Disconnect immediately if not approved.
+^C
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login local
+ transport input all
+!
+!
+end

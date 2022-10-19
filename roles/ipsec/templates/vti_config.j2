@@ -1,0 +1,45 @@
+{% if crypto_isakmp is defined %}
+crypto isakmp policy {{ crypto_isakmp.policy }}
+ encr {{ crypto_isakmp.encr }}
+ hash {{ crypto_isakmp.hash }}
+ authentication {{ crypto_isakmp.auth}} 
+ group  {{ crypto_isakmp.dh_gr}}
+ lifetime {{ crypto_isakmp.lifetime}} 
+{% endif %}
+
+{% if trset is defined %}
+crypto ipsec transform-set  {{ trset.name }} esp-aes esp-sha256-hmac 
+ mode {{ trset.mode}} 
+{% endif %}
+
+{% if Tunnels is defined %}
+{% for tunnel in Tunnels %}
+crypto ipsec profile {{ tunnel. vti_profile }}
+ set transform-set {{ trset.name }}
+{% if crypto_isakmp is defined %}
+crypto isakmp key {{ crypto_isakmp.key }} address {{ tunnel.dest }} 
+crypto isakmp invalid-spi-recovery
+{% endif %}
+
+interface {{ tunnel.name  }}
+ no shutdown
+ bandwidth {{ tunnel.bandwidth }}
+ ip address {{ tunnel.ipv4 | ipaddr('address') }} {{ tunnel.ipv4 | ipaddr('netmask')}}
+ ip mtu {{ tunnel.mtu }}
+ tunnel source {{ tunnel.src }}
+ tunnel mode {{ tunnel.mode }}
+ tunnel destination {{ tunnel.dest }}
+ tunnel protection ipsec profile {{ tunnel.vti_profile }}
+
+{% if ospf  is defined  %}
+router ospf {{ ospf.process_id }}
+ network {{ tunnel.ipv4 | ipaddr('network') }} {{ tunnel.ipv4 | ipaddr('wildcard')}} area 0
+exit
+
+{% endif %}
+ {% endfor %}
+
+
+{% endif %}
+
+

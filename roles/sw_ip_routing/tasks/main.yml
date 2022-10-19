@@ -1,0 +1,9 @@
+---
+# tasks file for roles/sw_ip_routing
+#ip routing
+
+- name: Enable ip routing on Switches
+  ios_config:
+    commands: 
+     - ip routing
+   

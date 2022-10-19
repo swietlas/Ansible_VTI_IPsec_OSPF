@@ -1,0 +1,74 @@
+---
+- name: Get date
+  hosts: localhost
+  gather_facts: true
+  tasks:
+    # - name:  Timestamp
+    #   ansible.builtin.debug:
+    #     msg:
+    #       - "Timestamp in the ISO8601 format: {{ ansible_date_time.iso8601 }}"
+    #   tags: gettime
+
+    - name: Config Timestamp
+      ansible.builtin.set_fact:
+        DTG: "{{ ansible_date_time.iso8601 }}"
+      tags: gettime  
+
+    # - name: display DTG
+    #   ansible.builtin.debug:
+    #     msg:
+    #       - "DTG is: {{ DTG }}" 
+    #   tags: gettime 
+
+- name: Pre CRQ config backup
+  hosts: all
+  gather_facts: false
+  tags: backup
+  vars:
+    pref: PRE-CRQ
+  roles:
+    - backup_config
+
+- name: Enable IP routing on switches only
+  hosts: core
+  gather_facts: False
+  tags: basic
+  roles:
+    - sw_ip_routing
+
+- name: Configuring Basic Settings (Addr,Banner,basic EIGRP)
+  hosts: all
+  gather_facts: False
+  tags: basic
+  roles:
+    - motd_banner
+    - rtr_interfaces
+    - ospf
+    - static_routes
+
+- name: Configuring IPsec VTI 
+  hosts: all
+  gather_facts: False
+  tags: basic
+  roles:
+    - ipsec
+    - save_config
+   
+- name: Pause for OSPF to converge
+  hosts: localhost
+  tasks:
+    - name: Add pasue task  
+      ansible.builtin.pause:
+        seconds: 15
+
+- name: Post CRQ config backup
+  hosts: all
+  tags: backup
+  gather_facts: False
+  vars:
+    pref: POST-CRQ
+  roles:
+    - show_status
+    - backup_config
+  
+...

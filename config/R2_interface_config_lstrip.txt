@@ -1,0 +1,12 @@
+interface Ethernet0/0
+   description Link to R1 configured by Ansible 
+   ip address 64.100.0.1 255.255.255.252
+   no shutdown
+interface Ethernet0/1
+   description Link to R3 configured by Ansible 
+   ip address 64.100.1.1 255.255.255.252
+   no shutdown
+interface Loopback 1
+   description Loopback 1 configured by Ansible 
+   ip address 209.165.200.225 255.255.255.224
+   no shutdown

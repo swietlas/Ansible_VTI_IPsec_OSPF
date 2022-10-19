@@ -1,0 +1,77 @@
+interfaces:
+ - name: Ethernet0/0
+   description: Link to R2 configured by Ansible
+   ipv4: 64.100.0.2/30
+  #  ipv6: 2001:db8:acad:12::1/64
+  #  link_local: fe80::12:1
+
+ - name: Ethernet0/1
+   description: Link to D1 configured by Ansible
+   ipv4: 10.10.0.1/29
+  #  ipv6: 2001:db8:acad:11::1/64
+  #  link_local: fe80::11:1
+   cdp: 'no'
+
+#  - name: Tunnel 1
+#    description: Link to D1 configured by Ansible
+#    ipv4: 172.16.1.1/30
+
+
+#IPSec Config Section   
+Tunnels:
+  - name: Tunnel 1 
+    ipv4: 172.16.1.1/30
+    src: "64.100.0.2"
+    dest: "64.100.1.2"
+    mode: "ipsec ipv4"
+    protection: "ipsec" 
+    vti_profile: "VTI_PROFILE"
+    mtu: 1400
+    bandwidth: 4000
+  # - name: Tunnel 2 
+  #   ipv4: 172.162.1.1/30
+  #   src: "164.100.0.222"
+  #   dest: "164.100.1.222"
+  #   mode: "ipsec ipv4"
+  #   protection: "ipsec" 
+  #   vti_profile: "VTI_PROFILE2"
+  #   mtu: 1400
+  #   bandwidth: 3000
+
+crypto_isakmp:
+  policy: 10
+  encr: aes
+  hash: sha256
+  auth: pre-share
+  dh_gr: 14
+  lifetime: 3600
+  key: cisco123 
+
+trset:
+  name: VTI_VPN
+  mode: tunnel
+
+# OSPF config data
+ospf:
+  process_id: 123
+  router_id: 1.1.1.1
+  default_orignate: "True"
+  auto_cost:
+    reference_bandwidth: 1000
+ospf_networks:
+    - address: "10.10.0.0"
+      wildcard_bits: "0.0.0.3"
+      area: "0"
+    - address: "10.10.0.0"
+      wildcard_bits: "0.0.0.3"
+      area: "0"
+
+# Additional static routes
+routes:
+  - route: 1
+    dest: "0.0.0.0/0"
+    nexthop: "64.100.0.1"
+    name: "Default_to_R2"
+
+#ip route 0.0.0.0 0.0.0.0 64.100.0.1
+

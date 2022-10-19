@@ -1,0 +1,45 @@
+---
+# tasks file for roles/show_status
+
+- name: Send list of show commands to all device(s)
+  ios_command:
+    commands: 
+     - show ip int brief
+     - sh ip route | begin Gateway
+     - sh ip ospf neighbor 
+     - sh ip protocols | section ospf
+    #  - sh interface Tunnel 1
+    #  - sh interface tunnel 1 | inc protection|source|protocol|Internet|MTU
+    #  - sh crypto session 
+     
+  register: command_output
+
+- name: Display command output stored in "command_output" variable
+  debug:
+    var: command_output["stdout_lines"]
+
+    #var: command_output["stdout_lines"][0]
+
+# - name: Display value of "shipint" variable
+#   ansible.builtin.debug:
+#     msg:
+#       - "INTERFACES:"
+#       - " {{ command_output['stdout_lines'][0] | to_json }}"
+#       #- " EIGRP NEIGHBORS:"
+#       #- " {{ command_output['stdout_lines'][1] | to_json }}"
+#       # - command_output["stdout_lines"][1]
+#       # - command_output["stdout_lines"][2]
+#       # - command_output["stdout_lines"][3]
+- name: Send list of show commands to IPsec enabled device(s)
+  ios_command:
+    commands: 
+
+     - sh interface Tunnel 1
+     - sh interface tunnel 1 | inc protection|source|protocol|Internet|MTU
+     - sh crypto session 
+  register: command_output2
+  when: "Tunnels is defined"
+
+- name: Display command output stored in "command_output" variable
+  debug:
+    var: command_output2["stdout_lines"]  

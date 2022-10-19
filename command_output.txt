@@ -1,0 +1,551 @@
+
+PLAY [Get date] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Config Timestamp] ********************************************************
+ok: [localhost]
+
+PLAY [Pre CRQ config backup] ***************************************************
+
+TASK [backup_config : Collect ios_facts] ***************************************
+ok: [R2]
+ok: [R1]
+ok: [D1]
+ok: [D2]
+ok: [R3]
+
+TASK [backup_config : Backup configuration] ************************************
+changed: [R2]
+changed: [D2]
+changed: [R3]
+changed: [D1]
+changed: [R1]
+
+PLAY [Enable IP routing on switches only] **************************************
+
+TASK [sw_ip_routing : Enable ip routing on Switches] ***************************
+changed: [D2]
+changed: [D1]
+
+PLAY [Configuring Basic Settings (Addr,Banner,basic EIGRP)] ********************
+
+TASK [motd_banner : Configure IOS banner] **************************************
+ok: [R2]
+ok: [D1]
+ok: [R1]
+ok: [R3]
+ok: [D2]
+
+TASK [rtr_interfaces :  Build IOS interface config files] **********************
+ok: [D1]
+ok: [R1]
+ok: [D2]
+ok: [R3]
+ok: [R2]
+
+TASK [rtr_interfaces :  Send interface interface basic config to device(s)] ****
+changed: [R1]
+changed: [R3]
+changed: [R2]
+changed: [D1]
+changed: [D2]
+
+TASK [ospf : Configure ospfv2 IPv4] ********************************************
+ok: [R3] => (item={'address': '10.10.4.0', 'wildcard_bits': '0.0.0.3', 'area': '0'})
+ok: [R1] => (item={'address': '10.10.0.0', 'wildcard_bits': '0.0.0.3', 'area': '0'})
+changed: [D1] => (item={'address': '10.10.0.0', 'wildcard_bits': '0.0.3.255', 'area': '0'})
+changed: [D2] => (item={'address': '10.10.4.0', 'wildcard_bits': '0.0.0.3', 'area': '0'})
+ok: [R1] => (item={'address': '10.10.0.0', 'wildcard_bits': '0.0.0.3', 'area': '0'})
+changed: [D2] => (item={'address': '10.10.16.0', 'wildcard_bits': '0.0.7.255', 'area': '0'})
+
+TASK [static_routes : Add static routes based on next hop interface] ***********
+changed: [R2] => (item=1)
+
+TASK [static_routes : Add static routes based on  next hop IP address] *********
+ok: [R2] => (item=2)
+ok: [R3] => (item=1)
+ok: [R1] => (item=1)
+ok: [R2] => (item=3)
+ok: [R2] => (item=4)
+
+PLAY [Configuring IPsec VTI] ***************************************************
+
+TASK [ipsec : Configure IPSec: transform set, Crypto ISAKMP, Tunnels] **********
+ok: [R2]
+ok: [D1]
+ok: [D2]
+changed: [R1]
+changed: [R3]
+
+TASK [save_config : IOS >> Save Configuration to NVRAM] ************************
+changed: [D2]
+changed: [D1]
+changed: [R3]
+changed: [R1]
+changed: [R2]
+
+PLAY [Pause for OSPF to converge] **********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Add pasue task] **********************************************************
+Pausing for 15 seconds
+(ctrl+C then 'C' = continue early, ctrl+C then 'A' = abort)
+ok: [localhost]
+
+PLAY [Post CRQ config backup] **************************************************
+
+TASK [show_status : Send list of show commands to all device(s)] ***************
+ok: [D2]
+ok: [R1]
+ok: [D1]
+ok: [R2]
+ok: [R3]
+
+TASK [show_status : Display command output stored in "command_output" variable] ***
+ok: [D1] => {
+    "command_output[\"stdout_lines\"]": [
+        [
+            "Interface              IP-Address      OK? Method Status                Protocol",
+            "Ethernet0/0            10.10.0.2       YES manual up                    up      ",
+            "Ethernet0/1            unassigned      YES unset  down                  down    ",
+            "Ethernet0/2            unassigned      YES unset  down                  down    ",
+            "Ethernet0/3            10.10.7.109     YES DHCP   up                    up      ",
+            "Loopback2              10.10.2.1       YES manual up                    up      ",
+            "Loopback3              10.10.3.1       YES manual up                    up"
+        ],
+        [
+            "Gateway of last resort is 10.10.0.1 to network 0.0.0.0",
+            "",
+            "O*E2  0.0.0.0/0 [110/1] via 10.10.0.1, 00:35:32, Ethernet0/0",
+            "      10.0.0.0/8 is variably subnetted, 15 subnets, 4 masks",
+            "C        10.10.0.0/29 is directly connected, Ethernet0/0",
+            "L        10.10.0.2/32 is directly connected, Ethernet0/0",
+            "C        10.10.2.0/24 is directly connected, Loopback2",
+            "L        10.10.2.1/32 is directly connected, Loopback2",
+            "C        10.10.3.0/24 is directly connected, Loopback3",
+            "L        10.10.3.1/32 is directly connected, Loopback3",
+            "O        10.10.4.0/30 [110/450] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.16.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.17.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.18.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.19.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.20.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.21.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.22.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "O        10.10.23.0/24 [110/451] via 10.10.0.1, 00:35:22, Ethernet0/0",
+            "      172.16.0.0/30 is subnetted, 1 subnets",
+            "O        172.16.1.0 [110/350] via 10.10.0.1, 00:35:32, Ethernet0/0"
+        ],
+        [
+            "Neighbor ID     Pri   State           Dead Time   Address         Interface",
+            "1.1.1.1           1   FULL/BDR        00:00:36    10.10.0.1       Ethernet0/0"
+        ],
+        [
+            "Routing Protocol is \"ospf 123\"",
+            "  Outgoing update filter list for all interfaces is not set",
+            "  Incoming update filter list for all interfaces is not set",
+            "  Router ID 10.10.3.1",
+            "  It is an autonomous system boundary router",
+            " Redistributing External Routes from,",
+            "  Number of areas in this router is 1. 1 normal 0 stub 0 nssa",
+            "  Maximum path: 4",
+            "  Routing for Networks:",
+            "    10.10.0.0 0.0.3.255 area 0",
+            "  Routing Information Sources:",
+            "    Gateway         Distance      Last Update",
+            "    1.1.1.1              110      00:35:32",
+            "    3.3.3.1              110      00:35:32",
+            "     10.10.23.1           110      00:35:22",
+            "    10.10.23.1           110      00:35:22",
+            "  Distance: (default is 110)"
+        ]
+    ]
+}
+ok: [R2] => {
+    "command_output[\"stdout_lines\"]": [
+        [
+            "Interface                  IP-Address      OK? Method Status                Protocol",
+            "Ethernet0/0                64.100.0.1      YES manual up                    up      ",
+            "Ethernet0/1                64.100.1.1      YES manual up                    up      ",
+            "Ethernet0/2                unassigned      YES TFTP   administratively down down    ",
+            "Ethernet0/3                10.10.7.161     YES DHCP   up                    up      ",
+            "Loopback1                  209.165.200.225 YES manual up                    up"
+        ],
+        [
+            "Gateway of last resort is 0.0.0.0 to network 0.0.0.0",
+            "",
+            "S*    0.0.0.0/0 is directly connected, Loopback1",
+            "      10.0.0.0/8 is variably subnetted, 3 subnets, 2 masks",
+            "S        10.10.0.0/22 [10/0] via 64.100.0.2",
+            "S        10.10.4.0/22 [10/0] via 64.100.1.2",
+            "S        10.10.16.0/21 [10/0] via 64.100.1.2",
+            "      64.0.0.0/8 is variably subnetted, 4 subnets, 2 masks",
+            "C        64.100.0.0/30 is directly connected, Ethernet0/0",
+            "L        64.100.0.1/32 is directly connected, Ethernet0/0",
+            "C        64.100.1.0/30 is directly connected, Ethernet0/1",
+            "L        64.100.1.1/32 is directly connected, Ethernet0/1",
+            "      209.165.200.0/24 is variably subnetted, 2 subnets, 2 masks",
+            "C        209.165.200.224/27 is directly connected, Loopback1",
+            "L        209.165.200.225/32 is directly connected, Loopback1"
+        ],
+        [
+            ""
+        ],
+        [
+            ""
+        ]
+    ]
+}
+ok: [R3] => {
+    "command_output[\"stdout_lines\"]": [
+        [
+            "Interface                  IP-Address      OK? Method Status                Protocol",
+            "Ethernet0/0                64.100.1.2      YES manual up                    up      ",
+            "Ethernet0/1                10.10.4.1       YES manual up                    up      ",
+            "Ethernet0/2                unassigned      YES TFTP   administratively down down    ",
+            "Ethernet0/3                10.10.7.210     YES DHCP   up                    up      ",
+            "Tunnel1                    172.16.1.2      YES manual up                    up"
+        ],
+        [
+            "Gateway of last resort is 64.100.1.1 to network 0.0.0.0",
+            "",
+            "S*    0.0.0.0/0 [10/0] via 64.100.1.1",
+            "      10.0.0.0/8 is variably subnetted, 13 subnets, 4 masks",
+            "O        10.10.0.0/29 [110/350] via 172.16.1.1, 00:35:28, Tunnel1",
+            "O        10.10.2.0/24 [110/351] via 172.16.1.1, 00:35:23, Tunnel1",
+            "O        10.10.3.0/24 [110/351] via 172.16.1.1, 00:35:23, Tunnel1",
+            "C        10.10.4.0/30 is directly connected, Ethernet0/1",
+            "L        10.10.4.1/32 is directly connected, Ethernet0/1",
+            "O        10.10.16.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "O        10.10.17.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "O        10.10.18.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "O        10.10.19.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "O        10.10.20.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "O        10.10.21.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "O        10.10.22.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "O        10.10.23.0/24 [110/101] via 10.10.4.2, 00:35:28, Ethernet0/1",
+            "      64.0.0.0/8 is variably subnetted, 2 subnets, 2 masks",
+            "C        64.100.1.0/30 is directly connected, Ethernet0/0",
+            "L        64.100.1.2/32 is directly connected, Ethernet0/0",
+            "      172.16.0.0/16 is variably subnetted, 2 subnets, 2 masks",
+            "C        172.16.1.0/30 is directly connected, Tunnel1",
+            "L        172.16.1.2/32 is directly connected, Tunnel1"
+        ],
+        [
+            "Neighbor ID     Pri   State           Dead Time   Address         Interface",
+            "1.1.1.1           0   FULL/  -        00:00:38    172.16.1.1      Tunnel1",
+            "10.10.23.1        1   FULL/DR         00:00:38    10.10.4.2       Ethernet0/1"
+        ],
+        [
+            "Routing Protocol is \"ospf 123\"",
+            "  Outgoing update filter list for all interfaces is not set",
+            "  Incoming update filter list for all interfaces is not set",
+            "  Router ID 3.3.3.1",
+            "  It is an autonomous system boundary router",
+            " Redistributing External Routes from,",
+            "  Number of areas in this router is 1. 1 normal 0 stub 0 nssa",
+            "  Maximum path: 4",
+            "  Routing for Networks:",
+            "    10.10.4.0 0.0.0.3 area 0",
+            "    172.16.1.0 0.0.0.3 area 0",
+            "  Routing Information Sources:",
+            "    Gateway         Distance      Last Update",
+            "    1.1.1.1              110      00:35:17",
+            "    10.10.3.1            110      00:35:22",
+            "     10.10.23.1           110      00:35:27",
+            "    10.10.23.1           110      00:35:27",
+            "  Distance: (default is 110)"
+        ]
+    ]
+}
+ok: [D2] => {
+    "command_output[\"stdout_lines\"]": [
+        [
+            "Interface              IP-Address      OK? Method Status                Protocol",
+            "Ethernet0/0            10.10.4.2       YES manual up                    up      ",
+            "Ethernet0/1            unassigned      YES unset  down                  down    ",
+            "Ethernet0/2            unassigned      YES unset  down                  down    ",
+            "Ethernet0/3            10.10.7.158     YES DHCP   up                    up      ",
+            "Loopback16             10.10.16.1      YES manual up                    up      ",
+            "Loopback17             10.10.17.1      YES manual up                    up      ",
+            "Loopback18             10.10.18.1      YES manual up                    up      ",
+            "Loopback19             10.10.19.1      YES manual up                    up      ",
+            "Loopback20             10.10.20.1      YES manual up                    up      ",
+            "Loopback21             10.10.21.1      YES manual up                    up      ",
+            "Loopback22             10.10.22.1      YES manual up                    up      ",
+            "Loopback23             10.10.23.1      YES manual up                    up"
+        ],
+        [
+            "Gateway of last resort is 10.10.4.1 to network 0.0.0.0",
+            "",
+            "O*E2  0.0.0.0/0 [110/1] via 10.10.4.1, 00:35:32, Ethernet0/0",
+            "      10.0.0.0/8 is variably subnetted, 21 subnets, 4 masks",
+            "O        10.10.0.0/29 [110/450] via 10.10.4.1, 00:35:32, Ethernet0/0",
+            "O        10.10.2.0/24 [110/451] via 10.10.4.1, 00:35:22, Ethernet0/0",
+            "O        10.10.3.0/24 [110/451] via 10.10.4.1, 00:35:22, Ethernet0/0",
+            "C        10.10.4.0/30 is directly connected, Ethernet0/0",
+            "L        10.10.4.2/32 is directly connected, Ethernet0/0",
+            "C        10.10.16.0/24 is directly connected, Loopback16",
+            "L        10.10.16.1/32 is directly connected, Loopback16",
+            "C        10.10.17.0/24 is directly connected, Loopback17",
+            "L        10.10.17.1/32 is directly connected, Loopback17",
+            "C        10.10.18.0/24 is directly connected, Loopback18",
+            "L        10.10.18.1/32 is directly connected, Loopback18",
+            "C        10.10.19.0/24 is directly connected, Loopback19",
+            "L        10.10.19.1/32 is directly connected, Loopback19",
+            "C        10.10.20.0/24 is directly connected, Loopback20",
+            "L        10.10.20.1/32 is directly connected, Loopback20",
+            "C        10.10.21.0/24 is directly connected, Loopback21",
+            "L        10.10.21.1/32 is directly connected, Loopback21",
+            "C        10.10.22.0/24 is directly connected, Loopback22",
+            "L        10.10.22.1/32 is directly connected, Loopback22",
+            "C        10.10.23.0/24 is directly connected, Loopback23",
+            "L        10.10.23.1/32 is directly connected, Loopback23",
+            "      172.16.0.0/30 is subnetted, 1 subnets",
+            "O        172.16.1.0 [110/350] via 10.10.4.1, 00:35:32, Ethernet0/0"
+        ],
+        [
+            "Neighbor ID     Pri   State           Dead Time   Address         Interface",
+            "3.3.3.1           1   FULL/BDR        00:00:35    10.10.4.1       Ethernet0/0"
+        ],
+        [
+            "Routing Protocol is \"ospf 123\"",
+            "  Outgoing update filter list for all interfaces is not set",
+            "  Incoming update filter list for all interfaces is not set",
+            "  Router ID 10.10.23.1",
+            "  It is an autonomous system boundary router",
+            " Redistributing External Routes from,",
+            "  Number of areas in this router is 1. 1 normal 0 stub 0 nssa",
+            "  Maximum path: 4",
+            "  Routing for Networks:",
+            "    10.10.4.0 0.0.0.3 area 0",
+            "    10.10.16.0 0.0.7.255 area 0",
+            "  Routing Information Sources:",
+            "    Gateway         Distance      Last Update",
+            "    10.10.3.1            110      00:35:22",
+            "     3.3.3.1              110      00:35:32",
+            "    3.3.3.1              110      00:35:32",
+            "  Distance: (default is 110)"
+        ]
+    ]
+}
+ok: [R1] => {
+    "command_output[\"stdout_lines\"]": [
+        [
+            "Interface                  IP-Address      OK? Method Status                Protocol",
+            "Ethernet0/0                64.100.0.2      YES manual up                    up      ",
+            "Ethernet0/1                10.10.0.1       YES manual up                    up      ",
+            "Ethernet0/2                unassigned      YES TFTP   administratively down down    ",
+            "Ethernet0/3                10.10.7.112     YES DHCP   up                    up      ",
+            "Tunnel1                    172.16.1.1      YES manual up                    up"
+        ],
+        [
+            "Gateway of last resort is 64.100.0.1 to network 0.0.0.0",
+            "",
+            "S*    0.0.0.0/0 [10/0] via 64.100.0.1",
+            "      10.0.0.0/8 is variably subnetted, 13 subnets, 4 masks",
+            "C        10.10.0.0/29 is directly connected, Ethernet0/1",
+            "L        10.10.0.1/32 is directly connected, Ethernet0/1",
+            "O        10.10.2.0/24 [110/101] via 10.10.0.2, 00:35:28, Ethernet0/1",
+            "O        10.10.3.0/24 [110/101] via 10.10.0.2, 00:35:28, Ethernet0/1",
+            "O        10.10.4.0/30 [110/350] via 172.16.1.2, 00:35:28, Tunnel1",
+            "O        10.10.16.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "O        10.10.17.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "O        10.10.18.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "O        10.10.19.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "O        10.10.20.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "O        10.10.21.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "O        10.10.22.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "O        10.10.23.0/24 [110/351] via 172.16.1.2, 00:35:23, Tunnel1",
+            "      64.0.0.0/8 is variably subnetted, 2 subnets, 2 masks",
+            "C        64.100.0.0/30 is directly connected, Ethernet0/0",
+            "L        64.100.0.2/32 is directly connected, Ethernet0/0",
+            "      172.16.0.0/16 is variably subnetted, 2 subnets, 2 masks",
+            "C        172.16.1.0/30 is directly connected, Tunnel1",
+            "L        172.16.1.1/32 is directly connected, Tunnel1"
+        ],
+        [
+            "Neighbor ID     Pri   State           Dead Time   Address         Interface",
+            "3.3.3.1           0   FULL/  -        00:00:33    172.16.1.2      Tunnel1",
+            "10.10.3.1         1   FULL/DR         00:00:35    10.10.0.2       Ethernet0/1"
+        ],
+        [
+            "Routing Protocol is \"ospf 123\"",
+            "  Outgoing update filter list for all interfaces is not set",
+            "  Incoming update filter list for all interfaces is not set",
+            "  Router ID 1.1.1.1",
+            "  It is an autonomous system boundary router",
+            " Redistributing External Routes from,",
+            "  Number of areas in this router is 1. 1 normal 0 stub 0 nssa",
+            "  Maximum path: 4",
+            "  Routing for Networks:",
+            "    10.10.0.0 0.0.0.3 area 0",
+            "    172.16.1.0 0.0.0.3 area 0",
+            "  Routing Information Sources:",
+            "    Gateway         Distance      Last Update",
+            "    10.10.3.1            110      00:35:27",
+            "    3.3.3.1              110      00:35:17",
+            "     10.10.23.1           110      00:35:22",
+            "    10.10.23.1           110      00:35:22",
+            "  Distance: (default is 110)"
+        ]
+    ]
+}
+
+TASK [show_status : Send list of show commands to IPsec enabled device(s)] *****
+ok: [R1]
+ok: [R3]
+
+TASK [show_status : Display command output stored in "command_output" variable] ***
+ok: [D2] => {
+    "command_output2[\"stdout_lines\"]": "VARIABLE IS NOT DEFINED!"
+}
+ok: [R1] => {
+    "command_output2[\"stdout_lines\"]": [
+        [
+            "Tunnel1 is up, line protocol is up ",
+            "  Hardware is Tunnel",
+            "  Internet address is 172.16.1.1/30",
+            "  MTU 17878 bytes, BW 4000 Kbit/sec, DLY 50000 usec, ",
+            "     reliability 255/255, txload 1/255, rxload 1/255",
+            "  Encapsulation TUNNEL, loopback not set",
+            "  Keepalive not set",
+            "  Tunnel source 64.100.0.2, destination 64.100.1.2",
+            "  Tunnel protocol/transport IPSEC/IP",
+            "  Tunnel TTL 255",
+            "  Tunnel transport MTU 1438 bytes",
+            "  Tunnel transmit bandwidth 8000 (kbps)",
+            "  Tunnel receive bandwidth 8000 (kbps)",
+            "  Tunnel protection via IPSec (profile \"VTI_PROFILE\")",
+            "  Last input never, output never, output hang never",
+            "  Last clearing of \"show interface\" counters 00:36:05",
+            "  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0",
+            "  Queueing strategy: fifo",
+            "  Output queue: 0/0 (size/max)",
+            "  5 minute input rate 0 bits/sec, 0 packets/sec",
+            "  5 minute output rate 0 bits/sec, 0 packets/sec",
+            "     251 packets input, 20844 bytes, 0 no buffer",
+            "     Received 0 broadcasts (0 IP multicasts)",
+            "     0 runts, 0 giants, 0 throttles ",
+            "     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored, 0 abort",
+            "     253 packets output, 20564 bytes, 0 underruns",
+            "     0 output errors, 0 collisions, 0 interface resets",
+            "     0 unknown protocol drops",
+            "     0 output buffer failures, 0 output buffers swapped out"
+        ],
+        [
+            "Tunnel1 is up, line protocol is up ",
+            "  Internet address is 172.16.1.1/30",
+            "  MTU 17878 bytes, BW 4000 Kbit/sec, DLY 50000 usec, ",
+            "  Tunnel source 64.100.0.2, destination 64.100.1.2",
+            "  Tunnel protocol/transport IPSEC/IP",
+            "  Tunnel transport MTU 1438 bytes",
+            "  Tunnel protection via IPSec (profile \"VTI_PROFILE\")",
+            "     0 unknown protocol drops"
+        ],
+        [
+            "Crypto session current status",
+            "",
+            "Interface: Tunnel1",
+            "Session status: UP-ACTIVE     ",
+            "Peer: 64.100.1.2 port 500 ",
+            "  Session ID: 0  ",
+            "  IKEv1 SA: local 64.100.0.2/500 remote 64.100.1.2/500 Active ",
+            "  Session ID: 0  ",
+            "  IKEv1 SA: local 64.100.0.2/500 remote 64.100.1.2/500 Active ",
+            "  IPSEC FLOW: permit ip 0.0.0.0/0.0.0.0 0.0.0.0/0.0.0.0 ",
+            "        Active SAs: 4, origin: crypto map"
+        ]
+    ]
+}
+ok: [D1] => {
+    "command_output2[\"stdout_lines\"]": "VARIABLE IS NOT DEFINED!"
+}
+ok: [R3] => {
+    "command_output2[\"stdout_lines\"]": [
+        [
+            "Tunnel1 is up, line protocol is up ",
+            "  Hardware is Tunnel",
+            "  Internet address is 172.16.1.2/30",
+            "  MTU 17878 bytes, BW 4000 Kbit/sec, DLY 50000 usec, ",
+            "     reliability 255/255, txload 1/255, rxload 1/255",
+            "  Encapsulation TUNNEL, loopback not set",
+            "  Keepalive not set",
+            "  Tunnel source 64.100.1.2, destination 64.100.0.2",
+            "  Tunnel protocol/transport IPSEC/IP",
+            "  Tunnel TTL 255",
+            "  Tunnel transport MTU 1438 bytes",
+            "  Tunnel transmit bandwidth 8000 (kbps)",
+            "  Tunnel receive bandwidth 8000 (kbps)",
+            "  Tunnel protection via IPSec (profile \"VTI_PROFILE\")",
+            "  Last input never, output never, output hang never",
+            "  Last clearing of \"show interface\" counters 00:36:05",
+            "  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0",
+            "  Queueing strategy: fifo",
+            "  Output queue: 0/0 (size/max)",
+            "  5 minute input rate 0 bits/sec, 0 packets/sec",
+            "  5 minute output rate 0 bits/sec, 0 packets/sec",
+            "     253 packets input, 20564 bytes, 0 no buffer",
+            "     Received 0 broadcasts (0 IP multicasts)",
+            "     0 runts, 0 giants, 0 throttles ",
+            "     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored, 0 abort",
+            "     251 packets output, 20844 bytes, 0 underruns",
+            "     0 output errors, 0 collisions, 0 interface resets",
+            "     0 unknown protocol drops",
+            "     0 output buffer failures, 0 output buffers swapped out"
+        ],
+        [
+            "Tunnel1 is up, line protocol is up ",
+            "  Internet address is 172.16.1.2/30",
+            "  MTU 17878 bytes, BW 4000 Kbit/sec, DLY 50000 usec, ",
+            "  Tunnel source 64.100.1.2, destination 64.100.0.2",
+            "  Tunnel protocol/transport IPSEC/IP",
+            "  Tunnel transport MTU 1438 bytes",
+            "  Tunnel protection via IPSec (profile \"VTI_PROFILE\")",
+            "     0 unknown protocol drops"
+        ],
+        [
+            "Crypto session current status",
+            "",
+            "Interface: Tunnel1",
+            "Session status: UP-ACTIVE     ",
+            "Peer: 64.100.0.2 port 500 ",
+            "  Session ID: 0  ",
+            "  IKEv1 SA: local 64.100.1.2/500 remote 64.100.0.2/500 Active ",
+            "  Session ID: 0  ",
+            "  IKEv1 SA: local 64.100.1.2/500 remote 64.100.0.2/500 Active ",
+            "  IPSEC FLOW: permit ip 0.0.0.0/0.0.0.0 0.0.0.0/0.0.0.0 ",
+            "        Active SAs: 4, origin: crypto map"
+        ]
+    ]
+}
+ok: [R2] => {
+    "command_output2[\"stdout_lines\"]": "VARIABLE IS NOT DEFINED!"
+}
+
+TASK [backup_config : Collect ios_facts] ***************************************
+ok: [D1]
+ok: [R2]
+ok: [R1]
+ok: [D2]
+ok: [R3]
+
+TASK [backup_config : Backup configuration] ************************************
+changed: [D1]
+changed: [R1]
+changed: [R3]
+changed: [R2]
+changed: [D2]
+
+PLAY RECAP *********************************************************************
+D1                         : ok=14   changed=6    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+D2                         : ok=14   changed=6    unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+R1                         : ok=15   changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+R2                         : ok=14   changed=5    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+R3                         : ok=15   changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+localhost                  : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

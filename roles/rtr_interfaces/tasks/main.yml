@@ -1,0 +1,13 @@
+---
+# tasks file for rtr_interfaces
+
+- name: " Build IOS interface config files "
+  ansible.builtin.template:
+    src: "interfaces.j2"
+    dest: "config/{{ inventory_hostname }}_interface_config_lstrip.txt"
+
+- name: " Send interface interface basic config to device(s)"
+  cisco.ios.ios_config:
+    src: "config/{{ inventory_hostname }}_interface_config_lstrip.txt"
+    backup: "yes"
+    save_when: "modified"

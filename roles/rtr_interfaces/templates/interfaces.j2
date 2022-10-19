@@ -1,0 +1,26 @@
+#jinja2: lstrip_blocks:True, trim_blocks:True
+{% for intf in interfaces %}
+interface {{ intf.name }}
+{% if intf.description is defined %}
+   description {{ intf.description }} 
+{% endif %}
+{% if intf.mode is defined and intf.mode =="L3" %}
+   no switchport
+{% endif %}
+{% if intf.ipv4 is defined  %}
+   ip address {{ intf.ipv4 | ipaddr('address') }} {{ intf.ipv4 | ipaddr('netmask')}}
+{% endif %}
+{% if intf.ipv6 is defined %}
+   ipv6 address {{ intf.ipv6 }}
+{% endif %}
+{% if intf.link_local is defined %}
+   ipv6 address {{ intf.link_local}} link-local
+{% endif %}
+{% if intf.cdp is defined and intf.cdp =='no' %}
+   no cdp enable
+{% endif %}
+{% if intf.ospf is defined %}
+ ip ospf network point-to-point
+{% endif%}
+   no shutdown
+{% endfor %}

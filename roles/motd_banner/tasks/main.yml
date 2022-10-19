@@ -1,0 +1,12 @@
+---
+# tasks file for motd_banner
+- name: Configure IOS banner 
+  ios_banner:
+      banner: motd
+      text: |
+        Attention - This is a secure network device
+        Authorized personal only should connect and manage
+        this device.
+
+        Disconnect immediately if not approved.
+      state: present

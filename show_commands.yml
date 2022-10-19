@@ -1,0 +1,8 @@
+---
+- name: Verify if solution works
+  hosts: all
+  gather_facts: False
+  tags: basic
+  roles:
+    - show_status
+...

@@ -1,0 +1,33 @@
+---
+ansible_connection: network_cli
+ansible_become: yes
+ansible_become_method: enable
+ansible_network_os: ios
+ansible_user: ansi
+ansible_password: C1sc0123!
+allowed_vlans: 10-20,40
+native: 10
+
+vlans:
+  - id: 10
+    name: Ansible-Vlan DATA-VLAN
+  - id: 11
+    name: FirstVLAN Ansible
+  - id: 20
+    name: Ansible-Vlan HOST-VLAN
+  - id: 21
+    name: SecondVLAN Ansible
+  - id: 30
+    name: Ansible-Vlan 30
+  - id: 40 
+    name: Ansible-Vlan 40
+  - id: 40 
+    name: Ansible-Vlan 40
+  - id: 50
+    name: Ansible-Vlan MGMT
+  - id: 60
+    name: Ansible-Vlan DMZ 
+  - id: 70
+    name: Ansible-Vlan AT&T
+
+...

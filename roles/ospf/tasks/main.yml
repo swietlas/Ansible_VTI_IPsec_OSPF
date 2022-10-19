@@ -1,0 +1,19 @@
+---
+# tasks file for roles/ospf
+    - name: Configure ospfv2 IPv4
+      ios_ospfv2:
+        config:
+          processes:
+            - process_id: "{{ ospf.process_id }}"
+              router_id: "{{ ospf.router_id }}"
+              default_information:
+                originate: "{{ ospf.default_orignate }}"
+              auto_cost:
+               reference_bandwidth: "{{ ospf.auto_cost.reference_bandwidth }}"
+              network:
+                - address: "{{ item.address }}"
+                  area: "{{ item.area }}"
+                  wildcard_bits: "{{ item.wildcard_bits }}"
+      when: item.area is defined
+      loop: "{{ ospf_networks }}"
+      tags: ospfv2conf

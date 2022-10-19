@@ -1,0 +1,41 @@
+---
+# tasks file for roles/static_routes
+- name: Add static routes based on next hop interface
+  cisco.ios.ios_static_routes:
+    config:
+    - address_families:
+      - afi: ipv4
+        routes:
+        - dest: "{{ item.dest }}"
+          next_hops:
+          - interface: "{{ item.nexthop_intf }}" 
+            distance_metric: 10
+            tag: 40
+    state: merged
+  loop: "{{ routes }}"
+  loop_control:
+    label: "{{ item.route }}"
+  when: "item.nexthop_intf  is defined"       
+
+  # state: preset
+
+- name: Add static routes based on  next hop IP address
+  cisco.ios.ios_static_routes:
+    config:
+    - address_families:
+      - afi: ipv4
+        routes:
+        - dest: "{{ item.dest }}"
+          next_hops:
+          - forward_router_address: "{{ item.nexthop }}"
+            name: "{{ item.name }}"
+            distance_metric: 10
+            tag: 40
+    state: merged
+  loop: "{{ routes }}"
+  loop_control:
+    label: "{{ item.route }}"
+  when: "item.nexthop is defined"    
+
+
+  # state: preset

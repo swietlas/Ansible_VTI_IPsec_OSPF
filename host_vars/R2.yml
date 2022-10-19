@@ -1,0 +1,45 @@
+interfaces:
+ - name: Ethernet0/0
+   description: Link to R1 configured by Ansible
+   ipv4: 64.100.0.1/30
+  #  ipv6: 2001:db8:acad:12::2/64
+  #  link_local: fe80::12:2
+  
+ - name: Ethernet0/1
+   description: Link to R3 configured by Ansible
+   ipv4: 64.100.1.1/30
+  #  ipv6: 2001:db8:acad:23::2/64
+  #  link_local: fe80::23:2
+
+
+ - name: Loopback 1
+   description: Loopback 1 configured by Ansible
+   ipv4: 209.165.200.225/27
+  #  ipv6: 2001:db8:acad:1::1/64
+  #  link_local: fe80::1:1
+
+routes:
+  - route: 1
+    dest: "0.0.0.0/0"
+    name: "default_destination"
+    nexthop_intf: "Loopback 1"
+
+  - route: 2
+    dest: "10.10.0.0/22"
+    nexthop: "64.100.0.2"
+    name: "routes_to_R1"
+
+  - route: 3
+    dest: "10.10.4.0/22"
+    nexthop: "64.100.1.2"
+    name: "routes_to_R3"
+
+  - route: 4
+    dest: "10.10.16.0/21"
+    nexthop: "64.100.1.2"
+    name: "routes_to_R3"
+
+# ip route 0.0.0.0 0.0.0.0 Loopback0
+# ip route 10.10.0.0 255.255.252.0 64.100.0.2
+# ip route 10.10.4.0 255.255.252.0 64.100.1.2
+# ip route 10.10.16.0 255.255.248.0 64.100.1.2

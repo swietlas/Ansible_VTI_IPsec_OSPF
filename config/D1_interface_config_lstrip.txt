@@ -1,0 +1,15 @@
+interface Ethernet0/0
+   description Link to R1 configured by Ansible 
+   no switchport
+   ip address 10.10.0.2 255.255.255.248
+   no shutdown
+interface Loopback 2
+   description Loopback 2 configured by Ansible 
+   ip address 10.10.2.1 255.255.255.0
+ ip ospf network point-to-point
+   no shutdown
+interface Loopback 3
+   description Loopback 3 configured by Ansible 
+   ip address 10.10.3.1 255.255.255.0
+ ip ospf network point-to-point
+   no shutdown

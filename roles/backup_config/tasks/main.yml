@@ -1,0 +1,17 @@
+---
+# tasks file for backup_config
+
+- name: Collect ios_facts
+  cisco.ios.ios_facts:
+    gather_subset:
+      - min
+  register: facts
+  tags: hwinfo
+
+- name: Backup configuration 
+  cisco.ios.ios_config:
+    backup: yes
+    backup_options:
+      filename: "{{ pref }}_{{ ansible_net_hostname }}_{{ hostvars['localhost']['DTG'] }}.cfg"
+      dir_path: backups
+      
