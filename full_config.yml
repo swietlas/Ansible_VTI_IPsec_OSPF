@@ -53,7 +53,19 @@
   roles:
     - ipsec
     - save_config
-   
+
+- name: Rest Tunnel rtr_interfaces
+  hosts: all
+  gather_facts: False
+  tasks:
+    - name: Re-enabling tunnel rtr_interfaces
+      cisco.ios.ios_config:
+        lines:
+            - shutdown
+            - no shutdown
+        parents: interface Tunnel1
+      when: " Tunnels is defined" 
+
 - name: Pause for OSPF to converge
   hosts: localhost
   tasks:
